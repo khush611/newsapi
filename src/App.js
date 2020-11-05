@@ -6,33 +6,23 @@ class App extends Component {
         this.state = {
             data: [],
             searchItem:"",
-            searchStored:""
+            clicked:false
         }
         this.handleChange=this.handleChange.bind(this)
-        this.addItem=this.addItem.bind(this)
         this.loadUrl=this.loadUrl.bind(this)
     }
     handleChange(event) {
         this.setState({
            searchItem: event.target.value
             })
-            console.log(this.state.searchItem)
     }
-    addItem(event){
-        event.preventDefault()
-        this.setState({
-            searchStored:this.state.searchItem
-        })
-       //  this.setState({
-       //      searchItem:""
-       //  })
-        console.log(this.state.searchStored)
-   }
    
     loadUrl(event) {
         event.preventDefault()
-       if(this.state.todoList!=="" && this.state.todoList!==" "){
-        fetch(`https://newsapi.org/v2/everything?q=${this.state.searchStored}&apiKey=ed1eee6b688545cc91022ebf7ddade91`)
+         this.setState({clicked: true})
+          console.log("item: "+this.state.searchItem)
+        // const url ={this.state.search}
+        fetch(`https://newsapi.org/v2/everything?q=${this.state.searchItem}&apiKey=ed1eee6b688545cc91022ebf7ddade91`)
             .then(response => response.json())
             .then(data => {
                 this.setState({
@@ -40,27 +30,47 @@ class App extends Component {
                 })
                 console.log(this.state.data)
             })
-        } else {
-            console.log("nothing")
+        
+    }
+    componentDidMount() {
+        if(this.state.clicked===false){
+        fetch("https://newsapi.org/v2/everything?q=science&apiKey=ed1eee6b688545cc91022ebf7ddade91")
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    data: data.articles
+                })
+                console.log(this.state.data)
+            })
         }
     }
     
     render() {
         return (
             <div>
+                <h1 className="strokeh1">READ NEWS</h1>
                   <form>
-                <input type="text" name="todo" value={this.state.searchItem} onChange={this.handleChange}/>
-                <button onClick={this.addItem}>Search</button>
-                <button onClick={this.loadUrl}>See</button>
+               <input type="text" 
+                placeholder="What are you looking for?"
+                className="searchTerm"
+                 name="todo" value={this.state.searchItem}
+                  onChange={this.handleChange}
+                  />
+                <button onClick={this.loadUrl} className="example_b">See</button>
             </form>
-               {this.state.data.map((item,index)=>{
+            
+            {
+               this.state.data.map((item,index)=>{
                  return(
-                   <div>
-                 <h2>
+                   <div key={index}>
+                 <h2 className="strokeme">
                    {item.title}
                  </h2>
                  <img src={item.urlToImage} alt="pic" className="image"/>
-                <a href={item.url} className="button" target="_blank"><button >Read More...</button></a>
+                 <p>{item.description}</p>
+                <a href={item.url} target="_blank" rel="noreferrer">
+                    <button  className="example_b read" >Read More...</button>
+                    </a>
                  <hr/>
                  </div>
                  )
